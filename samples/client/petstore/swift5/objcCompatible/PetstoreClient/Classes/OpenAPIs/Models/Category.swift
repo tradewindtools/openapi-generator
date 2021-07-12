@@ -6,13 +6,21 @@
 //
 
 import Foundation
+#if canImport(AnyCodable)
+import AnyCodable
+#endif
 
-public struct Category: Codable {
+@objc public class Category: NSObject, Codable {
 
     public var _id: Int64?
-    public var name: String = "default-name"
+    public var _idNum: NSNumber? {
+        get {
+            return _id as NSNumber?
+        }
+    }
+    public var name: String? = "default-name"
 
-    public init(_id: Int64?, name: String) {
+    public init(_id: Int64? = nil, name: String? = "default-name") {
         self._id = _id
         self.name = name
     }
@@ -22,4 +30,12 @@ public struct Category: Codable {
         case name
     }
 
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(_id, forKey: ._id)
+        try container.encode(name, forKey: .name)
+    }
 }
+

@@ -16,35 +16,27 @@ import org.openapitools.client.models.Pet
 
 import org.openapitools.client.infrastructure.*
 import io.ktor.client.request.forms.formData
-import kotlinx.serialization.UnstableDefault
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 
-class PetApi @UseExperimental(UnstableDefault::class) constructor(
-        baseUrl: kotlin.String = "http://petstore.swagger.io/v2",
-        httpClientEngine: HttpClientEngine? = null,
-        serializer: KotlinxSerializer)
-    : ApiClient(baseUrl, httpClientEngine, serializer) {
-
-    @UseExperimental(UnstableDefault::class)
-    constructor(
-        baseUrl: kotlin.String = "http://petstore.swagger.io/v2",
-        httpClientEngine: HttpClientEngine? = null,
-        jsonConfiguration: JsonConfiguration = JsonConfiguration.Default)
-    : this(baseUrl, httpClientEngine, KotlinxSerializer(Json(jsonConfiguration)))
+class PetApi(
+    baseUrl: String = ApiClient.BASE_URL,
+    httpClientEngine: HttpClientEngine? = null,
+    jsonSerializer: Json = ApiClient.JSON_DEFAULT
+) : ApiClient(baseUrl, httpClientEngine, jsonSerializer) {
 
     /**
-    * Add a new pet to the store
-    * 
-    * @param body Pet object that needs to be added to the store 
-    * @return void
-    */
-    suspend fun addPet(body: Pet) : HttpResponse<Unit> {
+     * Add a new pet to the store
+     * 
+     * @param body Pet object that needs to be added to the store 
+     * @return void
+     */
+    suspend fun addPet(body: Pet): HttpResponse<Unit> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -54,7 +46,7 @@ class PetApi @UseExperimental(UnstableDefault::class) constructor(
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.POST,
             "/pet",
             query = localVariableQuery,
@@ -68,16 +60,16 @@ class PetApi @UseExperimental(UnstableDefault::class) constructor(
         ).wrap()
     }
 
-    
+
 
     /**
-    * Deletes a pet
-    * 
-    * @param petId Pet id to delete 
-    * @param apiKey  (optional)
-    * @return void
-    */
-    suspend fun deletePet(petId: kotlin.Long, apiKey: kotlin.String?) : HttpResponse<Unit> {
+     * Deletes a pet
+     * 
+     * @param petId Pet id to delete 
+     * @param apiKey  (optional)
+     * @return void
+     */
+    suspend fun deletePet(petId: kotlin.Long, apiKey: kotlin.String?): HttpResponse<Unit> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -89,9 +81,9 @@ class PetApi @UseExperimental(UnstableDefault::class) constructor(
         val localVariableHeaders = mutableMapOf<String, String>()
         apiKey?.apply { localVariableHeaders["api_key"] = this.toString() }
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.DELETE,
-            "/pet/{petId}".replace("{"+"petId"+"}", "$petId"),
+            "/pet/{petId}".replace("{" + "petId" + "}", "$petId"),
             query = localVariableQuery,
             headers = localVariableHeaders
         )
@@ -105,13 +97,13 @@ class PetApi @UseExperimental(UnstableDefault::class) constructor(
 
 
     /**
-    * Finds Pets by status
-    * Multiple status values can be provided with comma separated strings
-    * @param status Status values that need to be considered for filter 
-    * @return kotlin.Array<Pet>
-    */
+     * Finds Pets by status
+     * Multiple status values can be provided with comma separated strings
+     * @param status Status values that need to be considered for filter 
+     * @return kotlin.collections.List<Pet>
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun findPetsByStatus(status: kotlin.Array<kotlin.String>) : HttpResponse<kotlin.Array<Pet>> {
+    suspend fun findPetsByStatus(status: kotlin.collections.List<kotlin.String>): HttpResponse<kotlin.collections.List<Pet>> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -123,7 +115,7 @@ class PetApi @UseExperimental(UnstableDefault::class) constructor(
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/pet/findByStatus",
             query = localVariableQuery,
@@ -134,28 +126,28 @@ class PetApi @UseExperimental(UnstableDefault::class) constructor(
             localVariableConfig,
             localVariableBody,
             localVariableAuthNames
-        ).wrap<FindPetsByStatusResponse>().map { value.toTypedArray() }
+        ).wrap<FindPetsByStatusResponse>().map { value }
     }
 
     @Serializable
-private class FindPetsByStatusResponse(val value: List<Pet>) {
-    @Serializer(FindPetsByStatusResponse::class)
-    companion object : KSerializer<FindPetsByStatusResponse> {
-        private val serializer: KSerializer<List<Pet>> = Pet.serializer().list
-            override val descriptor = StringDescriptor.withName("FindPetsByStatusResponse")
+    private class FindPetsByStatusResponse(val value: List<Pet>) {
+        @Serializer(FindPetsByStatusResponse::class)
+        companion object : KSerializer<FindPetsByStatusResponse> {
+            private val serializer: KSerializer<List<Pet>> = serializer<List<Pet>>()
+            override val descriptor = serializer.descriptor
             override fun serialize(encoder: Encoder, obj: FindPetsByStatusResponse) = serializer.serialize(encoder, obj.value)
             override fun deserialize(decoder: Decoder) = FindPetsByStatusResponse(serializer.deserialize(decoder))
+        }
     }
-}
 
     /**
-    * Finds Pets by tags
-    * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
-    * @param tags Tags to filter by 
-    * @return kotlin.Array<Pet>
-    */
+     * Finds Pets by tags
+     * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+     * @param tags Tags to filter by 
+     * @return kotlin.collections.List<Pet>
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun findPetsByTags(tags: kotlin.Array<kotlin.String>) : HttpResponse<kotlin.Array<Pet>> {
+    suspend fun findPetsByTags(tags: kotlin.collections.List<kotlin.String>): HttpResponse<kotlin.collections.List<Pet>> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -167,7 +159,7 @@ private class FindPetsByStatusResponse(val value: List<Pet>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/pet/findByTags",
             query = localVariableQuery,
@@ -178,28 +170,28 @@ private class FindPetsByStatusResponse(val value: List<Pet>) {
             localVariableConfig,
             localVariableBody,
             localVariableAuthNames
-        ).wrap<FindPetsByTagsResponse>().map { value.toTypedArray() }
+        ).wrap<FindPetsByTagsResponse>().map { value }
     }
 
     @Serializable
-private class FindPetsByTagsResponse(val value: List<Pet>) {
-    @Serializer(FindPetsByTagsResponse::class)
-    companion object : KSerializer<FindPetsByTagsResponse> {
-        private val serializer: KSerializer<List<Pet>> = Pet.serializer().list
-            override val descriptor = StringDescriptor.withName("FindPetsByTagsResponse")
+    private class FindPetsByTagsResponse(val value: List<Pet>) {
+        @Serializer(FindPetsByTagsResponse::class)
+        companion object : KSerializer<FindPetsByTagsResponse> {
+            private val serializer: KSerializer<List<Pet>> = serializer<List<Pet>>()
+            override val descriptor = serializer.descriptor
             override fun serialize(encoder: Encoder, obj: FindPetsByTagsResponse) = serializer.serialize(encoder, obj.value)
             override fun deserialize(decoder: Decoder) = FindPetsByTagsResponse(serializer.deserialize(decoder))
+        }
     }
-}
 
     /**
-    * Find pet by ID
-    * Returns a single pet
-    * @param petId ID of pet to return 
-    * @return Pet
-    */
+     * Find pet by ID
+     * Returns a single pet
+     * @param petId ID of pet to return 
+     * @return Pet
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun getPetById(petId: kotlin.Long) : HttpResponse<Pet> {
+    suspend fun getPetById(petId: kotlin.Long): HttpResponse<Pet> {
 
         val localVariableAuthNames = listOf<String>("api_key")
 
@@ -210,9 +202,9 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
-            "/pet/{petId}".replace("{"+"petId"+"}", "$petId"),
+            "/pet/{petId}".replace("{" + "petId" + "}", "$petId"),
             query = localVariableQuery,
             headers = localVariableHeaders
         )
@@ -226,12 +218,12 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
 
 
     /**
-    * Update an existing pet
-    * 
-    * @param body Pet object that needs to be added to the store 
-    * @return void
-    */
-    suspend fun updatePet(body: Pet) : HttpResponse<Unit> {
+     * Update an existing pet
+     * 
+     * @param body Pet object that needs to be added to the store 
+     * @return void
+     */
+    suspend fun updatePet(body: Pet): HttpResponse<Unit> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -241,7 +233,7 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.PUT,
             "/pet",
             query = localVariableQuery,
@@ -255,17 +247,17 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
         ).wrap()
     }
 
-    
+
 
     /**
-    * Updates a pet in the store with form data
-    * 
-    * @param petId ID of pet that needs to be updated 
-    * @param name Updated name of the pet (optional)
-    * @param status Updated status of the pet (optional)
-    * @return void
-    */
-    suspend fun updatePetWithForm(petId: kotlin.Long, name: kotlin.String?, status: kotlin.String?) : HttpResponse<Unit> {
+     * Updates a pet in the store with form data
+     * 
+     * @param petId ID of pet that needs to be updated 
+     * @param name Updated name of the pet (optional)
+     * @param status Updated status of the pet (optional)
+     * @return void
+     */
+    suspend fun updatePetWithForm(petId: kotlin.Long, name: kotlin.String?, status: kotlin.String?): HttpResponse<Unit> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -279,9 +271,9 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.POST,
-            "/pet/{petId}".replace("{"+"petId"+"}", "$petId"),
+            "/pet/{petId}".replace("{" + "petId" + "}", "$petId"),
             query = localVariableQuery,
             headers = localVariableHeaders
         )
@@ -295,15 +287,15 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
 
 
     /**
-    * uploads an image
-    * 
-    * @param petId ID of pet to update 
-    * @param additionalMetadata Additional data to pass to server (optional)
-    * @param file file to upload (optional)
-    * @return ApiResponse
-    */
+     * uploads an image
+     * 
+     * @param petId ID of pet to update 
+     * @param additionalMetadata Additional data to pass to server (optional)
+     * @param file file to upload (optional)
+     * @return ApiResponse
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun uploadFile(petId: kotlin.Long, additionalMetadata: kotlin.String?, file: io.ktor.client.request.forms.InputProvider?) : HttpResponse<ApiResponse> {
+    suspend fun uploadFile(petId: kotlin.Long, additionalMetadata: kotlin.String?, file: io.ktor.client.request.forms.InputProvider?): HttpResponse<ApiResponse> {
 
         val localVariableAuthNames = listOf<String>("petstore_auth")
 
@@ -317,9 +309,9 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.POST,
-            "/pet/{petId}/uploadImage".replace("{"+"petId"+"}", "$petId"),
+            "/pet/{petId}/uploadImage".replace("{" + "petId" + "}", "$petId"),
             query = localVariableQuery,
             headers = localVariableHeaders
         )
@@ -332,13 +324,4 @@ private class FindPetsByTagsResponse(val value: List<Pet>) {
     }
 
 
-
-    companion object {
-        internal fun setMappers(serializer: KotlinxSerializer) {
-            
-            serializer.setMapper(FindPetsByStatusResponse::class, FindPetsByStatusResponse.serializer())
-            serializer.setMapper(FindPetsByTagsResponse::class, FindPetsByTagsResponse.serializer())
-            
-        }
-    }
 }

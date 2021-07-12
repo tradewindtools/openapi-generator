@@ -6,14 +6,22 @@
 //
 
 import Foundation
+#if canImport(AnyCodable)
+import AnyCodable
+#endif
 
-public struct OuterComposite: Codable {
+@objc public class OuterComposite: NSObject, Codable {
 
     public var myNumber: Double?
     public var myString: String?
     public var myBoolean: Bool?
+    public var myBooleanNum: NSNumber? {
+        get {
+            return myBoolean as NSNumber?
+        }
+    }
 
-    public init(myNumber: Double?, myString: String?, myBoolean: Bool?) {
+    public init(myNumber: Double? = nil, myString: String? = nil, myBoolean: Bool? = nil) {
         self.myNumber = myNumber
         self.myString = myString
         self.myBoolean = myBoolean
@@ -25,4 +33,13 @@ public struct OuterComposite: Codable {
         case myBoolean = "my_boolean"
     }
 
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(myNumber, forKey: .myNumber)
+        try container.encodeIfPresent(myString, forKey: .myString)
+        try container.encodeIfPresent(myBoolean, forKey: .myBoolean)
+    }
 }
+

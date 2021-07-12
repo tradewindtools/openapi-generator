@@ -21,9 +21,6 @@ import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 
 import org.openapitools.codegen.meta.features.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -44,7 +41,7 @@ public class AvroSchemaCodegen extends DefaultCodegen implements CodegenConfig {
                 .build();
 
         // TODO: Avro maintainer review.
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .parameterFeatures(EnumSet.noneOf(ParameterFeature.class))
                 .securityFeatures(EnumSet.noneOf(SecurityFeature.class))
                 .wireFormatFeatures(EnumSet.noneOf(WireFormatFeature.class))
@@ -55,7 +52,7 @@ public class AvroSchemaCodegen extends DefaultCodegen implements CodegenConfig {
                         SchemaSupportFeature.Union
                 )
                 .clientModificationFeatures(EnumSet.noneOf(ClientModificationFeature.class))
-                .build();
+        );
 
         outputFolder = "generated-code/avro-schema";
         modelTemplateFiles.put("model.mustache", ".avsc");

@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using {{packageName}}.Filters;{{/useSwashbuckle}}
 using {{packageName}}.Authentication;
+using {{packageName}}.Formatters;
 using Microsoft.AspNetCore.Authorization;
 
 namespace {{packageName}}
@@ -44,23 +45,22 @@ namespace {{packageName}}
         {
 {{#authMethods}}
 {{#isApiKey}}
-{{#-first}}
             services.AddTransient<IAuthorizationHandler, ApiKeyRequirementHandler>();
             services.AddAuthorization(authConfig =>
             {
-{{/-first}}            
                 authConfig.AddPolicy("{{name}}",
                     policyBuilder => policyBuilder
                         .AddRequirements(new ApiKeyRequirement(new[] { "my-secret-key" },"{{name}}")));
-{{#-last}}
             });
-{{/-last}}
 {{/isApiKey}}
 {{/authMethods}}
 
             // Add framework services.
             services
-                .AddMvc({{^useDefaultRouting}}opts => opts.EnableEndpointRouting = false{{/useDefaultRouting}})
+                .AddMvc(opts => {
+                    {{^useDefaultRouting}}opts.EnableEndpointRouting = false;{{/useDefaultRouting}}
+                    opts.InputFormatters.Insert(0, new InputFormatterStream());
+                    })
                 {{#compatibilityVersion}}
                 .SetCompatibilityVersion(CompatibilityVersion.{{compatibilityVersion}})
                 {{/compatibilityVersion}}
@@ -81,7 +81,7 @@ namespace {{packageName}}
                     {
                         Version = "{{#version}}{{{version}}}{{/version}}{{^version}}v1{{/version}}",
                         Title = "{{#appName}}{{{appName}}}{{/appName}}{{^appName}}{{packageName}}{{/appName}}",
-                        Description = "{{#appName}}{{{appName}}}{{/appName}}{{^appName}}{{packageName}}{{/appName}} (ASP.NET Core 2.0)",
+                        Description = "{{#appName}}{{{appName}}}{{/appName}}{{^appName}}{{packageName}}{{/appName}} (ASP.NET Core {{aspnetCoreVersion}})",
                         Contact = new Contact()
                         {
                            Name = "{{#infoName}}{{{infoName}}}{{/infoName}}{{^infoName}}OpenAPI-Generator Contributors{{/infoName}}",
@@ -127,12 +127,14 @@ namespace {{packageName}}
 
                     //TODO: Or alternatively use the original Swagger contract that's included in the static files
                     // c.SwaggerEndpoint("/openapi-original.json", "{{#appName}}{{{appName}}}{{/appName}}{{^appName}}{{packageName}}{{/appName}} Original");
-                }){{/useSwashbuckle}};{{^useDefaultRouting}}
+                }){{/useSwashbuckle}};
+            {{^useDefaultRouting}}
             app.UseRouting();
             app.UseEndpoints(endpoints =>
-	            {
-	    	        endpoints.MapControllers();
-	            });{{/useDefaultRouting}}
+                {
+                    endpoints.MapControllers();
+                });
+            {{/useDefaultRouting}}
 
             if (env.IsDevelopment())
             {

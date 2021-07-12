@@ -43,7 +43,7 @@ public class CppTizenClientCodegen extends AbstractCppCodegen implements Codegen
         super();
 
         // TODO: cpp-tizen maintainer review
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .securityFeatures(EnumSet.of(
                         SecurityFeature.BearerToken
@@ -61,7 +61,7 @@ public class CppTizenClientCodegen extends AbstractCppCodegen implements Codegen
                 .excludeParameterFeatures(
                         ParameterFeature.Cookie
                 )
-                .build();
+        );
 
         outputFolder = "";
         modelTemplateFiles.put("model-header.mustache", ".h");
@@ -288,7 +288,10 @@ public class CppTizenClientCodegen extends AbstractCppCodegen implements Codegen
     @Override
     public String toVarName(String name) {
         String paramName = name.replaceAll("[^a-zA-Z0-9_]", "");
-        paramName = Character.toLowerCase(paramName.charAt(0)) + paramName.substring(1);
+        if (name.length() > 0 ) {
+            // additionalProperties name is "" so name.length() == 0
+            paramName = Character.toLowerCase(paramName.charAt(0)) + paramName.substring(1);
+        }
         if (isReservedWord(paramName)) {
             return escapeReservedWord(paramName);
         }
@@ -316,6 +319,7 @@ public class CppTizenClientCodegen extends AbstractCppCodegen implements Codegen
      * @param name the name of the property
      * @return getter name based on naming convention
      */
+    @Override
     public String toBooleanGetter(String name) {
         return "get" + getterAndSetterCapitalize(name);
     }

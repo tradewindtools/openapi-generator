@@ -25,7 +25,13 @@ import org.openapitools.client.infrastructure.ResponseType
 import org.openapitools.client.infrastructure.Success
 import org.openapitools.client.infrastructure.toMultiValue
 
-class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiClient(basePath) {
+class StoreApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
+    companion object {
+        @JvmStatic
+        val defaultBasePath: String by lazy {
+            System.getProperties().getProperty("org.openapitools.client.baseUrl", "http://petstore.swagger.io/v2")
+        }
+    }
 
     /**
     * Delete purchase order by ID
@@ -38,18 +44,10 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     */
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun deleteOrder(orderId: kotlin.String) : Unit {
-        val localVariableBody: kotlin.Any? = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        val localVariableConfig = RequestConfig(
-            RequestMethod.DELETE,
-            "/store/order/{orderId}".replace("{"+"orderId"+"}", "$orderId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders
-        )
-        val localVarResponse = request<Any?>(
-            localVariableConfig,
-            localVariableBody
+        val localVariableConfig = deleteOrderRequestConfig(orderId = orderId)
+
+        val localVarResponse = request<Unit, Unit>(
+            localVariableConfig
         )
 
         return when (localVarResponse.responseType) {
@@ -68,6 +66,26 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     }
 
     /**
+    * To obtain the request config of the operation deleteOrder
+    *
+    * @param orderId ID of the order that needs to be deleted 
+    * @return RequestConfig
+    */
+    fun deleteOrderRequestConfig(orderId: kotlin.String) : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.DELETE,
+            path = "/store/order/{orderId}".replace("{"+"orderId"+"}", "$orderId"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
     * Returns pet inventories by status
     * Returns a map of status codes to quantities
     * @return kotlin.collections.Map<kotlin.String, kotlin.Int>
@@ -78,18 +96,10 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun getInventory() : kotlin.collections.Map<kotlin.String, kotlin.Int> {
-        val localVariableBody: kotlin.Any? = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        val localVariableConfig = RequestConfig(
-            RequestMethod.GET,
-            "/store/inventory",
-            query = localVariableQuery,
-            headers = localVariableHeaders
-        )
-        val localVarResponse = request<kotlin.collections.Map<kotlin.String, kotlin.Int>>(
-            localVariableConfig,
-            localVariableBody
+        val localVariableConfig = getInventoryRequestConfig()
+
+        val localVarResponse = request<Unit, kotlin.collections.Map<kotlin.String, kotlin.Int>>(
+            localVariableConfig
         )
 
         return when (localVarResponse.responseType) {
@@ -108,6 +118,25 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     }
 
     /**
+    * To obtain the request config of the operation getInventory
+    *
+    * @return RequestConfig
+    */
+    fun getInventoryRequestConfig() : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/store/inventory",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
     * Find purchase order by ID
     * For valid response try integer IDs with value &lt;&#x3D; 5 or &gt; 10. Other values will generated exceptions
     * @param orderId ID of pet that needs to be fetched 
@@ -119,18 +148,10 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun getOrderById(orderId: kotlin.Long) : Order {
-        val localVariableBody: kotlin.Any? = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        val localVariableConfig = RequestConfig(
-            RequestMethod.GET,
-            "/store/order/{orderId}".replace("{"+"orderId"+"}", "$orderId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders
-        )
-        val localVarResponse = request<Order>(
-            localVariableConfig,
-            localVariableBody
+        val localVariableConfig = getOrderByIdRequestConfig(orderId = orderId)
+
+        val localVarResponse = request<Unit, Order>(
+            localVariableConfig
         )
 
         return when (localVarResponse.responseType) {
@@ -149,6 +170,26 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     }
 
     /**
+    * To obtain the request config of the operation getOrderById
+    *
+    * @param orderId ID of pet that needs to be fetched 
+    * @return RequestConfig
+    */
+    fun getOrderByIdRequestConfig(orderId: kotlin.Long) : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/store/order/{orderId}".replace("{"+"orderId"+"}", "$orderId"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
     * Place an order for a pet
     * 
     * @param body order placed for purchasing the pet 
@@ -160,18 +201,10 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun placeOrder(body: Order) : Order {
-        val localVariableBody: kotlin.Any? = body
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        val localVariableConfig = RequestConfig(
-            RequestMethod.POST,
-            "/store/order",
-            query = localVariableQuery,
-            headers = localVariableHeaders
-        )
-        val localVarResponse = request<Order>(
-            localVariableConfig,
-            localVariableBody
+        val localVariableConfig = placeOrderRequestConfig(body = body)
+
+        val localVarResponse = request<Order, Order>(
+            localVariableConfig
         )
 
         return when (localVarResponse.responseType) {
@@ -187,6 +220,26 @@ class StoreApi(basePath: kotlin.String = "http://petstore.swagger.io/v2") : ApiC
                 throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
             }
         }
+    }
+
+    /**
+    * To obtain the request config of the operation placeOrder
+    *
+    * @param body order placed for purchasing the pet 
+    * @return RequestConfig
+    */
+    fun placeOrderRequestConfig(body: Order) : RequestConfig<Order> {
+        val localVariableBody = body
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/store/order",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
     }
 
 }

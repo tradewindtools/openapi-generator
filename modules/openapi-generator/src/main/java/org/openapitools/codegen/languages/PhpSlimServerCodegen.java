@@ -34,10 +34,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
-import static org.openapitools.codegen.utils.StringUtils.*;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class PhpSlimServerCodegen extends AbstractPhpCodegen {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PhpSlimServerCodegen.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(PhpSlimServerCodegen.class);
 
     public static final String USER_CLASSNAME_KEY = "userClassname";
 
@@ -49,7 +49,7 @@ public class PhpSlimServerCodegen extends AbstractPhpCodegen {
     public PhpSlimServerCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .wireFormatFeatures(EnumSet.of(WireFormatFeature.JSON, WireFormatFeature.XML))
                 .securityFeatures(EnumSet.noneOf(SecurityFeature.class))
@@ -62,7 +62,7 @@ public class PhpSlimServerCodegen extends AbstractPhpCodegen {
                 .excludeSchemaSupportFeatures(
                         SchemaSupportFeature.Polymorphism
                 )
-                .build();
+        );
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
                 .stability(Stability.DEPRECATED)
@@ -92,7 +92,7 @@ public class PhpSlimServerCodegen extends AbstractPhpCodegen {
 
         // override cliOptions from AbstractPhpCodegen
         for (CliOption co : cliOptions) {
-            if (co.getOpt().equals(AbstractPhpCodegen.VARIABLE_NAMING_CONVENTION)) {
+            if (AbstractPhpCodegen.VARIABLE_NAMING_CONVENTION.equals(co.getOpt())) {
                 co.setDescription("naming convention of variable name, e.g. camelCase.");
                 co.setDefault("camelCase");
                 break;
@@ -241,7 +241,7 @@ public class PhpSlimServerCodegen extends AbstractPhpCodegen {
                                 .replace("\\/", "/"))
                         .replaceAll("[\\t\\n\\r]", " ")
                         .replace("\\", "\\\\"));
-                        // .replace("\"", "\\\""));
+        // .replace("\"", "\\\""));
 
         // from AbstractPhpCodegen.java
         // Trim the string to avoid leading and trailing spaces.

@@ -19,15 +19,8 @@ package org.openapitools.codegen.languages;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
-import io.swagger.models.properties.ArrayProperty;
-import io.swagger.models.properties.MapProperty;
-import io.swagger.models.properties.Property;
-import io.swagger.models.parameters.Parameter;
-
 import java.io.File;
 import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
 
 import org.openapitools.codegen.meta.features.*;
 import org.slf4j.Logger;
@@ -36,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class FsharpFunctionsServerCodegen extends AbstractFSharpCodegen {
     public static final String PROJECT_NAME = "projectName";
 
-    static Logger LOGGER = LoggerFactory.getLogger(FsharpFunctionsServerCodegen.class);
+     final Logger LOGGER = LoggerFactory.getLogger(FsharpFunctionsServerCodegen.class);
 
     public CodegenType getTag() {
         return CodegenType.SERVER;
@@ -54,7 +47,7 @@ public class FsharpFunctionsServerCodegen extends AbstractFSharpCodegen {
         super();
 
         // TODO: There's a README.mustache, but it doesn't seem to be referenced…
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
 //                .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .wireFormatFeatures(EnumSet.of(WireFormatFeature.JSON))
                 .securityFeatures(EnumSet.noneOf(
@@ -74,7 +67,7 @@ public class FsharpFunctionsServerCodegen extends AbstractFSharpCodegen {
                 .includeParameterFeatures(
                         ParameterFeature.Cookie
                 )
-                .build();
+        );
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
                 .stability(Stability.BETA)
@@ -155,7 +148,7 @@ public class FsharpFunctionsServerCodegen extends AbstractFSharpCodegen {
         return outputFolder + File.separator + sourceFolder + File.separator + "impl";
     }
 
-    @Override()
+    @Override
     public String toModelImport(String name) {
         return packageName + "." + modelPackage() + "." + name;
     }

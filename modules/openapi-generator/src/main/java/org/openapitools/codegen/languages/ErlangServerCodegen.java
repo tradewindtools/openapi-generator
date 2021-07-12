@@ -33,7 +33,7 @@ import static org.openapitools.codegen.utils.StringUtils.underscore;
 
 public class ErlangServerCodegen extends DefaultCodegen implements CodegenConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ErlangServerCodegen.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ErlangServerCodegen.class);
 
     protected String apiVersion = "1.0.0";
     protected String apiPath = "src";
@@ -43,7 +43,7 @@ public class ErlangServerCodegen extends DefaultCodegen implements CodegenConfig
     public ErlangServerCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .wireFormatFeatures(EnumSet.of(WireFormatFeature.JSON))
                 .securityFeatures(EnumSet.of(
@@ -62,7 +62,7 @@ public class ErlangServerCodegen extends DefaultCodegen implements CodegenConfig
                 .excludeParameterFeatures(
                         ParameterFeature.Cookie
                 )
-                .build();
+        );
 
         // set the output folder here
         outputFolder = "generated-code/erlang-server";
@@ -173,7 +173,8 @@ public class ErlangServerCodegen extends DefaultCodegen implements CodegenConfig
         supportingFiles.add(new SupportingFile("openapi.mustache", "", toPrivFilePath(this.openApiSpecName, "json")));
         supportingFiles.add(new SupportingFile("default_logic_handler.mustache", "", toSourceFilePath("default_logic_handler", "erl")));
         supportingFiles.add(new SupportingFile("logic_handler.mustache", "", toSourceFilePath("logic_handler", "erl")));
-        writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README.md"));
+        supportingFiles.add(new SupportingFile("README.mustache", "", "README.md")
+            .doNotOverwrite());
     }
 
     @Override
@@ -255,7 +256,7 @@ public class ErlangServerCodegen extends DefaultCodegen implements CodegenConfig
     public String toOperationId(String operationId) {
         // method name cannot use reserved keyword, e.g. return
         if (isReservedWord(operationId)) {
-            LOGGER.warn(operationId + " (reserved word) cannot be used as method name. Renamed to " + camelize(sanitizeName("call_" + operationId)));
+            LOGGER.warn("{} (reserved word) cannot be used as method name. Renamed to {}", operationId, camelize(sanitizeName("call_" + operationId)));
             operationId = "call_" + operationId;
         }
 
@@ -325,4 +326,8 @@ public class ErlangServerCodegen extends DefaultCodegen implements CodegenConfig
         return input.replace("-ifdef", "- if def").replace("-endif", "- end if");
     }
 
+    @Override
+    public String addRegularExpressionDelimiter(String pattern) {
+        return pattern;
+    }
 }

@@ -15,35 +15,27 @@ import org.openapitools.client.models.Order
 
 import org.openapitools.client.infrastructure.*
 import io.ktor.client.request.forms.formData
-import kotlinx.serialization.UnstableDefault
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 
-class StoreApi @UseExperimental(UnstableDefault::class) constructor(
-        baseUrl: kotlin.String = "http://petstore.swagger.io/v2",
-        httpClientEngine: HttpClientEngine? = null,
-        serializer: KotlinxSerializer)
-    : ApiClient(baseUrl, httpClientEngine, serializer) {
-
-    @UseExperimental(UnstableDefault::class)
-    constructor(
-        baseUrl: kotlin.String = "http://petstore.swagger.io/v2",
-        httpClientEngine: HttpClientEngine? = null,
-        jsonConfiguration: JsonConfiguration = JsonConfiguration.Default)
-    : this(baseUrl, httpClientEngine, KotlinxSerializer(Json(jsonConfiguration)))
+class StoreApi(
+    baseUrl: String = ApiClient.BASE_URL,
+    httpClientEngine: HttpClientEngine? = null,
+    jsonSerializer: Json = ApiClient.JSON_DEFAULT
+) : ApiClient(baseUrl, httpClientEngine, jsonSerializer) {
 
     /**
-    * Delete purchase order by ID
-    * For valid response try integer IDs with value &lt; 1000. Anything above 1000 or nonintegers will generate API errors
-    * @param orderId ID of the order that needs to be deleted 
-    * @return void
-    */
-    suspend fun deleteOrder(orderId: kotlin.String) : HttpResponse<Unit> {
+     * Delete purchase order by ID
+     * For valid response try integer IDs with value &lt; 1000. Anything above 1000 or nonintegers will generate API errors
+     * @param orderId ID of the order that needs to be deleted 
+     * @return void
+     */
+    suspend fun deleteOrder(orderId: kotlin.String): HttpResponse<Unit> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -54,9 +46,9 @@ class StoreApi @UseExperimental(UnstableDefault::class) constructor(
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.DELETE,
-            "/store/order/{orderId}".replace("{"+"orderId"+"}", "$orderId"),
+            "/store/order/{orderId}".replace("{" + "orderId" + "}", "$orderId"),
             query = localVariableQuery,
             headers = localVariableHeaders
         )
@@ -70,12 +62,12 @@ class StoreApi @UseExperimental(UnstableDefault::class) constructor(
 
 
     /**
-    * Returns pet inventories by status
-    * Returns a map of status codes to quantities
-    * @return kotlin.collections.Map<kotlin.String, kotlin.Int>
-    */
+     * Returns pet inventories by status
+     * Returns a map of status codes to quantities
+     * @return kotlin.collections.Map<kotlin.String, kotlin.Int>
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun getInventory() : HttpResponse<kotlin.collections.Map<kotlin.String, kotlin.Int>> {
+    suspend fun getInventory(): HttpResponse<kotlin.collections.Map<kotlin.String, kotlin.Int>> {
 
         val localVariableAuthNames = listOf<String>("api_key")
 
@@ -86,7 +78,7 @@ class StoreApi @UseExperimental(UnstableDefault::class) constructor(
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/store/inventory",
             query = localVariableQuery,
@@ -101,24 +93,24 @@ class StoreApi @UseExperimental(UnstableDefault::class) constructor(
     }
 
     @Serializable
-private class GetInventoryResponse(val value: Map<kotlin.String, kotlin.Int>) {
-    @Serializer(GetInventoryResponse::class)
-    companion object : KSerializer<GetInventoryResponse> {
-        private val serializer: KSerializer<Map<kotlin.String, kotlin.Int>> = (kotlin.String.serializer() to kotlin.Int.serializer()).map
-            override val descriptor = StringDescriptor.withName("GetInventoryResponse")
+    private class GetInventoryResponse(val value: Map<kotlin.String, kotlin.Int>) {
+        @Serializer(GetInventoryResponse::class)
+        companion object : KSerializer<GetInventoryResponse> {
+            private val serializer: KSerializer<Map<kotlin.String, kotlin.Int>> = serializer<Map<String, kotlin.Int>>()
+            override val descriptor = serializer.descriptor
             override fun serialize(encoder: Encoder, obj: GetInventoryResponse) = serializer.serialize(encoder, obj.value)
             override fun deserialize(decoder: Decoder) = GetInventoryResponse(serializer.deserialize(decoder))
+        }
     }
-}
 
     /**
-    * Find purchase order by ID
-    * For valid response try integer IDs with value &lt;&#x3D; 5 or &gt; 10. Other values will generated exceptions
-    * @param orderId ID of pet that needs to be fetched 
-    * @return Order
-    */
+     * Find purchase order by ID
+     * For valid response try integer IDs with value &lt;&#x3D; 5 or &gt; 10. Other values will generated exceptions
+     * @param orderId ID of pet that needs to be fetched 
+     * @return Order
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun getOrderById(orderId: kotlin.Long) : HttpResponse<Order> {
+    suspend fun getOrderById(orderId: kotlin.Long): HttpResponse<Order> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -129,9 +121,9 @@ private class GetInventoryResponse(val value: Map<kotlin.String, kotlin.Int>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
-            "/store/order/{orderId}".replace("{"+"orderId"+"}", "$orderId"),
+            "/store/order/{orderId}".replace("{" + "orderId" + "}", "$orderId"),
             query = localVariableQuery,
             headers = localVariableHeaders
         )
@@ -145,13 +137,13 @@ private class GetInventoryResponse(val value: Map<kotlin.String, kotlin.Int>) {
 
 
     /**
-    * Place an order for a pet
-    * 
-    * @param body order placed for purchasing the pet 
-    * @return Order
-    */
+     * Place an order for a pet
+     * 
+     * @param body order placed for purchasing the pet 
+     * @return Order
+     */
     @Suppress("UNCHECKED_CAST")
-    suspend fun placeOrder(body: Order) : HttpResponse<Order> {
+    suspend fun placeOrder(body: Order): HttpResponse<Order> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -161,7 +153,7 @@ private class GetInventoryResponse(val value: Map<kotlin.String, kotlin.Int>) {
 
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig(
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.POST,
             "/store/order",
             query = localVariableQuery,
@@ -175,13 +167,6 @@ private class GetInventoryResponse(val value: Map<kotlin.String, kotlin.Int>) {
         ).wrap()
     }
 
-    
 
 
-    companion object {
-        internal fun setMappers(serializer: KotlinxSerializer) {
-            serializer.setMapper(GetInventoryResponse::class, GetInventoryResponse.serializer())
-            
-        }
-    }
 }

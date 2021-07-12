@@ -1,6 +1,5 @@
 package org.openapitools.codegen.validations.oas;
 
-import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.openapitools.codegen.TestUtils;
 import org.openapitools.codegen.validation.Invalid;
@@ -9,7 +8,6 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +35,7 @@ public class OpenApiSchemaTypeTest {
     @DataProvider(name = "oas31RecommendationExpectations")
     public Object[][] oas31RecommendationExpectations() {
         return new Object[][]{
-            {TestUtils.parseSpec("src/test/resources/3_1/null-types.yaml"), true}
+            {TestUtils.parseFlattenSpec("src/test/resources/3_1/null-types.yaml"), true}
         };
     }
 }

@@ -34,12 +34,12 @@ import java.util.List;
 
 public class PhpClientCodegen extends AbstractPhpCodegen {
     @SuppressWarnings("hiding")
-    private static final Logger LOGGER = LoggerFactory.getLogger(PhpClientCodegen.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(PhpClientCodegen.class);
 
     public PhpClientCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .wireFormatFeatures(EnumSet.of(WireFormatFeature.JSON, WireFormatFeature.XML))
                 .securityFeatures(EnumSet.noneOf(SecurityFeature.class))
@@ -52,7 +52,7 @@ public class PhpClientCodegen extends AbstractPhpCodegen {
                 .excludeSchemaSupportFeatures(
                         SchemaSupportFeature.Polymorphism
                 )
-                .build();
+        );
 
         // clear import mapping (from default generator) as php does not use it
         // at the moment

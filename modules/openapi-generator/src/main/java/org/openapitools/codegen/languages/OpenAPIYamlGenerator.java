@@ -36,14 +36,14 @@ import java.util.Map;
 public class OpenAPIYamlGenerator extends DefaultCodegen implements CodegenConfig {
     public static final String OUTPUT_NAME = "outputFile";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenAPIYamlGenerator.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(OpenAPIYamlGenerator.class);
 
     protected String outputFile = "openapi/openapi.yaml";
 
     public OpenAPIYamlGenerator() {
         super();
 
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .documentationFeatures(EnumSet.allOf(DocumentationFeature.class))
                 .dataTypeFeatures(EnumSet.allOf(DataTypeFeature.class))
                 .wireFormatFeatures(EnumSet.allOf(WireFormatFeature.class))
@@ -51,7 +51,7 @@ public class OpenAPIYamlGenerator extends DefaultCodegen implements CodegenConfi
                 .globalFeatures(EnumSet.allOf(GlobalFeature.class))
                 .parameterFeatures(EnumSet.allOf(ParameterFeature.class))
                 .schemaSupportFeatures(EnumSet.allOf(SchemaSupportFeature.class))
-                .build();
+        );
 
         embeddedTemplateDir = templateDir = "openapi-yaml";
         outputFolder = "generated-code/openapi-yaml";

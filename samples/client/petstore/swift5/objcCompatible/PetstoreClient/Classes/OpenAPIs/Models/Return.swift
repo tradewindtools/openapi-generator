@@ -6,13 +6,21 @@
 //
 
 import Foundation
+#if canImport(AnyCodable)
+import AnyCodable
+#endif
 
 /** Model for testing reserved words */
-public struct Return: Codable {
+@objc public class Return: NSObject, Codable {
 
     public var _return: Int?
+    public var _returnNum: NSNumber? {
+        get {
+            return _return as NSNumber?
+        }
+    }
 
-    public init(_return: Int?) {
+    public init(_return: Int? = nil) {
         self._return = _return
     }
 
@@ -20,4 +28,11 @@ public struct Return: Codable {
         case _return = "return"
     }
 
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(_return, forKey: ._return)
+    }
 }
+

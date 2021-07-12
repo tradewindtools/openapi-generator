@@ -13,7 +13,9 @@ package org.openapitools.client.models
 
 
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.CommonEnumSerializer
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
+
 /**
  * A category for a pet
  * @param id 

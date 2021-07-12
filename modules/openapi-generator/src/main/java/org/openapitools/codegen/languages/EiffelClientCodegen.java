@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 public class EiffelClientCodegen extends AbstractEiffelCodegen {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EiffelClientCodegen.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(EiffelClientCodegen.class);
 
     protected String libraryTarget = "openapi_eiffel_client";
     protected String packageName = "Eiffel";
@@ -61,7 +61,7 @@ public class EiffelClientCodegen extends AbstractEiffelCodegen {
     public EiffelClientCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .securityFeatures(EnumSet.of(
                         SecurityFeature.OAuth2_Implicit,
@@ -84,7 +84,7 @@ public class EiffelClientCodegen extends AbstractEiffelCodegen {
                         ClientModificationFeature.BasePath,
                         ClientModificationFeature.UserAgent
                 )
-                .build();
+        );
 
         uuid = UUID.randomUUID();
         uuidTest = UUID.randomUUID();

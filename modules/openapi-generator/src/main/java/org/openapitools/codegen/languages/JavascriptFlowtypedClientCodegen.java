@@ -23,8 +23,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
-import org.openapitools.codegen.utils.ModelUtils;
-
 import java.util.*;
 
 import static org.openapitools.codegen.utils.StringUtils.dashize;
@@ -37,9 +35,7 @@ public class JavascriptFlowtypedClientCodegen extends AbstractTypeScriptClientCo
     public JavascriptFlowtypedClientCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
-                .includeDocumentationFeatures(DocumentationFeature.Readme)
-                .build();
+        modifyFeatureSet(features -> features.includeDocumentationFeatures(DocumentationFeature.Readme));
 
         // clear import mapping (from default generator) as TS does not use it
         // at the moment
@@ -109,7 +105,7 @@ public class JavascriptFlowtypedClientCodegen extends AbstractTypeScriptClientCo
 
     @Override
     protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
-        codegenModel.additionalPropertiesType = getTypeDeclaration(ModelUtils.getAdditionalProperties(schema));
+        codegenModel.additionalPropertiesType = getTypeDeclaration(getAdditionalProperties(schema));
         addImport(codegenModel, codegenModel.additionalPropertiesType);
     }
 

@@ -23,8 +23,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
-import org.openapitools.codegen.utils.ModelUtils;
-
 import java.io.File;
 import java.util.*;
 
@@ -44,9 +42,7 @@ public class TypeScriptInversifyClientCodegen extends AbstractTypeScriptClientCo
     public TypeScriptInversifyClientCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
-                .includeDocumentationFeatures(DocumentationFeature.Readme)
-                .build();
+        modifyFeatureSet(features -> features.includeDocumentationFeatures(DocumentationFeature.Readme));
 
         this.outputFolder = "generated-code/typescript-inversify";
 
@@ -78,7 +74,7 @@ public class TypeScriptInversifyClientCodegen extends AbstractTypeScriptClientCo
 
     @Override
     protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
-        codegenModel.additionalPropertiesType = getTypeDeclaration(ModelUtils.getAdditionalProperties(schema));
+        codegenModel.additionalPropertiesType = getTypeDeclaration(getAdditionalProperties(schema));
         addImport(codegenModel, codegenModel.additionalPropertiesType);
     }
 
@@ -145,7 +141,7 @@ public class TypeScriptInversifyClientCodegen extends AbstractTypeScriptClientCo
 
     @Override
     public boolean isDataTypeFile(final String dataType) {
-        return dataType != null && dataType.equals("Blob");
+        return "Blob".equals(dataType);
     }
 
     @Override
@@ -225,7 +221,7 @@ public class TypeScriptInversifyClientCodegen extends AbstractTypeScriptClientCo
                         insideCurly--;
 
                         // Add the more complicated component instead of just the brace.
-                        pathBuffer.append(toVarName(parameterName.toString()));
+                        pathBuffer.append(toParamName(parameterName.toString()));
                         pathBuffer.append("))}");
                         parameterName.setLength(0);
                         break;

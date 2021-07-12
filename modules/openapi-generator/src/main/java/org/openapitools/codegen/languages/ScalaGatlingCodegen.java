@@ -39,7 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ScalaGatlingCodegen extends AbstractScalaCodegen implements CodegenConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScalaGatlingCodegen.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ScalaGatlingCodegen.class);
 
     // source folder where to write the files
     protected String resourceFolder = "src" + File.separator + "gatling" + File.separator + "resources";
@@ -82,7 +82,7 @@ public class ScalaGatlingCodegen extends AbstractScalaCodegen implements Codegen
         // Although the generator supports authorization, it's done via manual header modification and it's done
         // globally. This means it doesn't _technically_ support auth per OpenAPI Spec (which would allow, for example, a different API key per operation),
         // so it's not listed here as supported.
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .wireFormatFeatures(EnumSet.of(WireFormatFeature.JSON, WireFormatFeature.XML, WireFormatFeature.Custom))
                 .securityFeatures(EnumSet.noneOf(SecurityFeature.class))
@@ -101,7 +101,7 @@ public class ScalaGatlingCodegen extends AbstractScalaCodegen implements Codegen
                 .includeClientModificationFeatures(
                         ClientModificationFeature.BasePath
                 )
-                .build();
+        );
 
         sourceFolder = "src" + File.separator + "gatling" + File.separator + "scala";
 
@@ -279,7 +279,7 @@ public class ScalaGatlingCodegen extends AbstractScalaCodegen implements Codegen
                 if (operation.getParameters() != null) {
 
                     for (Parameter parameter : operation.getParameters()) {
-                        if (parameter.getIn().equalsIgnoreCase("header")) {
+                        if ("header".equalsIgnoreCase(parameter.getIn())) {
                             headerParameters.add(parameter);
                         }
                     /* need to revise below as form parameter is no longer in the parameter list
@@ -287,10 +287,10 @@ public class ScalaGatlingCodegen extends AbstractScalaCodegen implements Codegen
                         formParameters.add(parameter);
                     }
                     */
-                        if (parameter.getIn().equalsIgnoreCase("query")) {
+                        if ("query".equalsIgnoreCase(parameter.getIn())) {
                             queryParameters.add(parameter);
                         }
-                        if (parameter.getIn().equalsIgnoreCase("path")) {
+                        if ("path".equalsIgnoreCase(parameter.getIn())) {
                             pathParameters.add(parameter);
                         }
                     /* TODO need to revise below as body is no longer in the parameter
@@ -387,7 +387,7 @@ public class ScalaGatlingCodegen extends AbstractScalaCodegen implements Codegen
             Schema inner = ap.getItems();
             return getSchemaType(p) + "[" + getTypeDeclaration(inner) + "]";
         } else if (ModelUtils.isMapSchema(p)) {
-            Schema inner = ModelUtils.getAdditionalProperties(p);
+            Schema inner = getAdditionalProperties(p);
             return getSchemaType(p) + "[String, " + getTypeDeclaration(inner) + "]";
         }
         return super.getTypeDeclaration(p);

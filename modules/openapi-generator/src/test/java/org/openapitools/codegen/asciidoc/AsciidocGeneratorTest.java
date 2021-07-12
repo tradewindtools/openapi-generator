@@ -11,7 +11,6 @@ import org.apache.commons.io.FileUtils;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.DefaultGenerator;
-import org.openapitools.codegen.MockDefaultGenerator;
 import org.openapitools.codegen.TestUtils;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.languages.AsciidocDocumentationCodegen;
@@ -25,11 +24,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 /** unit test asciidoc markup generation against ping.yaml openapi spec. */
 public class AsciidocGeneratorTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsciidocGeneratorTest.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(AsciidocGeneratorTest.class);
 
     @Test
     public void testPingSpecTitle() throws Exception {
-        final OpenAPI openAPI = TestUtils.parseSpec("src/test/resources/3_0/ping.yaml");
+        final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/ping.yaml");
 
         AsciidocDocumentationCodegen codeGen = new AsciidocDocumentationCodegen();
         codeGen.preprocessOpenAPI(openAPI);
@@ -48,10 +47,9 @@ public class AsciidocGeneratorTest {
                 .addAdditionalProperty(AsciidocDocumentationCodegen.SPEC_DIR, "MY-SPEC-DIR");
 
         final ClientOptInput clientOptInput = configurator.toClientOptInput();
-        MockDefaultGenerator generator = new MockDefaultGenerator();
-        generator.opts(clientOptInput).generate();
-
-        Map<String, String> generatedFiles = generator.getFiles();
+        DefaultGenerator generator = new DefaultGenerator();
+        generator.setGenerateMetadata(false);
+        List<File> generatedFiles = generator.opts(clientOptInput).generate();
         TestUtils.ensureContainsFile(generatedFiles, output, "index.adoc");
     }
 
@@ -61,7 +59,7 @@ public class AsciidocGeneratorTest {
         output.mkdirs();
         output.deleteOnExit();
 
-        final OpenAPI openAPI = TestUtils.parseSpec("src/test/resources/3_0/ping.yaml");
+        final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/ping.yaml");
         CodegenConfig codegenConfig = new AsciidocDocumentationCodegen();
         codegenConfig.setOutputDir(output.getAbsolutePath());
         ClientOptInput clientOptInput = new ClientOptInput().openAPI(openAPI).config(codegenConfig);
@@ -87,7 +85,7 @@ public class AsciidocGeneratorTest {
     public void testAdditionalDirectoriesGeneratedIntoHeaderAttributes() throws Exception {
         File output = Files.createTempDirectory("test").toFile();
 
-        LOGGER.info("test: generating sample markup " + output.getAbsolutePath());
+        LOGGER.info("test: generating sample markup {}", output.getAbsolutePath());
 
         Map<String, Object> props = new TreeMap<String, Object>();
         props.put("specDir", "spec");
@@ -113,13 +111,13 @@ public class AsciidocGeneratorTest {
         Assert.assertTrue(markupFileGenerated, "index.adoc is not generated!");
 
     }
-    
+
 
     @Test
     public void testHeaderAttributesFlagRemovesAttributesFromMarkupHeaderSection() throws Exception {
         File output = Files.createTempDirectory("test").toFile();
 
-        LOGGER.info("test: generating sample markup " + output.getAbsolutePath());
+        LOGGER.info("test: generating sample markup {}", output.getAbsolutePath());
 
         Map<String, Object> props = new TreeMap<String, Object>();
         props.put("specDir", "spec");
@@ -148,6 +146,6 @@ public class AsciidocGeneratorTest {
             }
         }
         Assert.assertTrue(markupFileGenerated, "index.adoc is not generated!");
-    }    
+    }
 
 }

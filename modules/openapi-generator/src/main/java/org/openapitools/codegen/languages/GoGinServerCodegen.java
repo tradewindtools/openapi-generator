@@ -16,6 +16,7 @@
 
 package org.openapitools.codegen.languages;
 
+import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenType;
@@ -32,7 +33,7 @@ import java.util.Map;
 
 public class GoGinServerCodegen extends AbstractGoCodegen {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GoGinServerCodegen.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(GoGinServerCodegen.class);
 
     protected String apiVersion = "1.0.0";
     protected int serverPort = 8080;
@@ -42,7 +43,7 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
     public GoGinServerCodegen() {
         super();
 
-        featureSet = getFeatureSet().modify()
+        modifyFeatureSet(features -> features
                 .includeDocumentationFeatures(DocumentationFeature.Readme)
                 .wireFormatFeatures(EnumSet.of(WireFormatFeature.JSON, WireFormatFeature.XML))
                 .securityFeatures(EnumSet.noneOf(
@@ -60,7 +61,7 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
                 .excludeParameterFeatures(
                         ParameterFeature.Cookie
                 )
-                .build();
+        );
 
         // set the output folder here
         outputFolder = "generated-code/go";
@@ -107,6 +108,16 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
                         "continue", "for", "import", "return", "var", "error", "nil")
                 // Added "error" as it's used so frequently that it may as well be a keyword
         );
+
+        cliOptions.add(new CliOption("apiPath", "Name of the folder that contains the Go source code")
+                .defaultValue(apiPath));
+
+        CliOption optServerPort = new CliOption("serverPort", "The network port the generated server binds to");
+        optServerPort.setType("int");
+        optServerPort.defaultValue(Integer.toString(serverPort));
+        cliOptions.add(optServerPort);
+
+        cliOptions.add(CliOption.newBoolean(CodegenConstants.ENUM_CLASS_PREFIX, CodegenConstants.ENUM_CLASS_PREFIX_DESC));
     }
 
     @Override
@@ -156,6 +167,13 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
             additionalProperties.put("apiPath", apiPath);
         }
 
+        if (additionalProperties.containsKey(CodegenConstants.ENUM_CLASS_PREFIX)) {
+            setEnumClassPrefix(Boolean.parseBoolean(additionalProperties.get(CodegenConstants.ENUM_CLASS_PREFIX).toString()));
+            if (enumClassPrefix) {
+                additionalProperties.put(CodegenConstants.ENUM_CLASS_PREFIX, true);
+            }
+        }
+
         modelPackage = packageName;
         apiPackage = packageName;
 
@@ -168,7 +186,8 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
         supportingFiles.add(new SupportingFile("main.mustache", "", "main.go"));
         supportingFiles.add(new SupportingFile("Dockerfile.mustache", "", "Dockerfile"));
         supportingFiles.add(new SupportingFile("routers.mustache", apiPath, "routers.go"));
-        writeOptional(outputFolder, new SupportingFile("README.mustache", apiPath, "README.md"));
+        supportingFiles.add(new SupportingFile("README.mustache", apiPath, "README.md")
+                .doNotOverwrite());
     }
 
     @Override

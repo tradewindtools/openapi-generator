@@ -6,8 +6,11 @@
 //
 
 import Foundation
+#if canImport(AnyCodable)
+import AnyCodable
+#endif
 
-public struct Pet: Codable {
+@objc public class Pet: NSObject, Codable {
 
     public enum Status: String, Codable, CaseIterable {
         case available = "available"
@@ -15,6 +18,11 @@ public struct Pet: Codable {
         case sold = "sold"
     }
     public var _id: Int64?
+    public var _idNum: NSNumber? {
+        get {
+            return _id as NSNumber?
+        }
+    }
     public var category: Category?
     public var name: String
     public var photoUrls: [String]
@@ -22,7 +30,7 @@ public struct Pet: Codable {
     /** pet status in the store */
     public var status: Status?
 
-    public init(_id: Int64?, category: Category?, name: String, photoUrls: [String], tags: [Tag]?, status: Status?) {
+    public init(_id: Int64? = nil, category: Category? = nil, name: String, photoUrls: [String], tags: [Tag]? = nil, status: Status? = nil) {
         self._id = _id
         self.category = category
         self.name = name
@@ -40,4 +48,16 @@ public struct Pet: Codable {
         case status
     }
 
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(_id, forKey: ._id)
+        try container.encodeIfPresent(category, forKey: .category)
+        try container.encode(name, forKey: .name)
+        try container.encode(photoUrls, forKey: .photoUrls)
+        try container.encodeIfPresent(tags, forKey: .tags)
+        try container.encodeIfPresent(status, forKey: .status)
+    }
 }
+
